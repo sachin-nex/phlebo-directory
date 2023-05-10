@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- CSS Center = cssc;01 -->
+        <style>
+            body {
+                width: 90%;
+                height: 100%;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+            }
+            table {
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+            }
+            td,th {
+                border: 2px solid #999;
+                padding: 0.5rem;
+            }
+        </style>
+        <title>External Phlebo Directory</title>
+    </head>
+    <body>
+        <h2>External Phlebo Directory</h2>
+        <hr>
+            <form action="#" id="searchForm">
+                <input type="text" name="city" placeholder="Search City" value = "">
+                <input type="number" name="pincode" placeholder="Search Pincode" value = "">
+                <button type="Submit" id="search">Search</button>
+            </form>
+        <div>  
+        <!-- Table to display fetched user data -->
+        <table id="users"></table>
+        </div>
+        <hr>  
+        <h3>Last Updated:</h3>
+        <p>Tuesday December 21 2021 0714 AM</p>
+    
+        <!-- Link JavaScript file -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script>
+            // Replace {database_id}, {secret_key} and {property_name} with your actual values
+            var database_id = "c1fb06bec1dc43e6bdb10a9bdb7194f7";
+            var secret_key = "secret_1dooXCi5ERGgKl7Gc0Ko9Dax7AEErnDkoFvYt4q5SSq";
+
+            // Construct the API endpoint URL
+            var endpoint_url = "https://api.notion.com/v1/databases/" + database_id + "/query";
+            console.log(endpoint_url);
+            var request_headers = {
+                "Access-Control-Allow-Origin":"*",
+                "Notion-Version": "2022-06-28",
+                "Authorization": "Bearer " + secret_key,
+                "Content-Type": "application/json",
+            }
+
+            $(document).ready(function() {
+            $('#searchForm').submit(function(event) {
+                event.preventDefault(); // Prevent form from submitting
+                var city = $('input[name="city"]').val();
+                var pincode = $('input[name="pincode"]').val();
+                if(pincode.length > 0 && city.length == 0){
+                    request_data = {
+                        "filter": {
+                            "property": "Pincode",
+                            "number": {
+                            "equals": pincode
+                            }
+                        }
+                    }
+                }
+                else if(pincode.length == 0 && city.length > 0){
+                    request_data = {
+                        "filter": {
+                            "property": "City",
+                            "rich_text": {
+                            "equals": city
+                            }
+                        }
+                    }
+                }else{
+                    request_data = {
+                        "filter": {
+                            "and": [{
+                                "property": "Pincode",
+                                "number": {
+                                    "equals": pincode
+                                }
+                            },
+                            {
+                                "property": "City",
+                                "rich_text": {
+                                    "equals": city
+                                }
+                            }   
+                
+                        ]}
+                    }
+                }
+
+                $.ajax({
+                    url: endpoint_url,
+                    headers: request_headers,
+                    type: "POST",
+                    data: JSON.stringify(request_data),
+                    success: function(response) {
+                        console.log(response);
+                        // Handle the API response here
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("API Error: " + error);
+                        // Handle the API error here
+                    }
+                });
+
+            });
+            });
+        </script>
+    </body>
+</html>
